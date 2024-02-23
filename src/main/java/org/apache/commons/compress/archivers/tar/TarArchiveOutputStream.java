@@ -27,6 +27,7 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
@@ -41,7 +42,6 @@ import org.apache.commons.compress.archivers.zip.ZipEncodingHelper;
 import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.commons.compress.utils.FixedLengthBlockOutputStream;
 import org.apache.commons.compress.utils.TimeUtils;
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.output.CountingOutputStream;
 
 /**
@@ -208,8 +208,8 @@ public class TarArchiveOutputStream extends ArchiveOutputStream<TarArchiveEntry>
         if (realBlockSize <= 0 || realBlockSize % RECORD_SIZE != 0) {
             throw new IllegalArgumentException("Block size must be a multiple of 512 bytes. Attempt to use set size of " + blockSize);
         }
-        out = new FixedLengthBlockOutputStream(countingOut = new CountingOutputStream(os), RECORD_SIZE);
-        this.charsetName = Charsets.toCharset(encoding).name();
+        this.out = new FixedLengthBlockOutputStream(countingOut = new CountingOutputStream(os), RECORD_SIZE);
+        this.charsetName = (encoding == null ? Charset.defaultCharset() : Charset.forName(encoding)).name();
         this.zipEncoding = ZipEncodingHelper.getZipEncoding(encoding);
 
         this.recordBuf = new byte[RECORD_SIZE];
